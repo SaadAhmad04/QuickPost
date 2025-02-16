@@ -11,6 +11,11 @@ import 'Secret.dart';
 import 'apis.dart';
 
 class Notifications {
+  static List<String> scopes = [
+    "https://www.googleapis.com/auth/userinfo.email",
+    "https://www.googleapis.com/auth/firebase.database",
+    "https://www.googleapis.com/auth/firebase.messaging"
+  ];
   static FirebaseMessaging _msg = FirebaseMessaging.instance;
 
   static void requestNotificationPermission() async {
@@ -85,13 +90,13 @@ class Notifications {
   static Future<String> getServerKey() async {
     http.Client client = await auth.clientViaServiceAccount(
       auth.ServiceAccountCredentials.fromJson(Secret.serviceAccountJson),
-      Secret.scopes,
+      scopes,
     );
 
     auth.AccessCredentials credentials =
     await auth.obtainAccessCredentialsViaServiceAccount(
         auth.ServiceAccountCredentials.fromJson(Secret.serviceAccountJson),
-        Secret.scopes,
+        scopes,
         client);
 
     client.close();
