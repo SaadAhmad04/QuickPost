@@ -135,7 +135,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     _buildGridItem(context,
                         title: 'Profile', icon: Icons.person, onTap: () async {
-                      await Notifications.getServerKey();
                       Navigator.push(
                         context,
                         MaterialPageRoute(
