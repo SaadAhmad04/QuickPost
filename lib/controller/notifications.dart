@@ -82,6 +82,22 @@ class Notifications {
     }
   }
 
+  static Future<String> getServerKey() async {
+    http.Client client = await auth.clientViaServiceAccount(
+      auth.ServiceAccountCredentials.fromJson(Secret.serviceAccountJson),
+      Secret.scopes,
+    );
+
+    auth.AccessCredentials credentials =
+    await auth.obtainAccessCredentialsViaServiceAccount(
+        auth.ServiceAccountCredentials.fromJson(Secret.serviceAccountJson),
+        Secret.scopes,
+        client);
+
+    client.close();
+    return credentials.accessToken.data;
+  }
+
   static Future<void> pushNotifications1(
       Map<String, String> tokenAndId,
       String msg,
@@ -90,7 +106,7 @@ class Notifications {
       String type,
       Map<String, String> videoDetails) async {
     try {
-      final String serverKey = await Secret.getServerKey();
+      final String serverKey = await getServerKey();
       String endpointFirebaseMessaging =
           'https://fcm.googleapis.com/v1/projects/assignment-4ab3e/messages:send';
 
