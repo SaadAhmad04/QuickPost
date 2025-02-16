@@ -1,20 +1,28 @@
-<<<<<<< HEAD
-# QuickPost
-=======
-# quickpost
+# My Flutter Video App 🎥
 
-A new Flutter project.
+This is the first version of my Flutter app using Dart 3, Firebase, and FL Chart for video analytics.
 
-## Getting Started
+## Features
+✅ Upload and store videos in Firebase  
+✅ Generate thumbnails  
+✅ Video analytics (likes, dislikes, comments, views)  
+✅ Interactive UI with a purple theme  
+✅ Notifications for likes, dislikes, and comments  
 
-This project is a starting point for a Flutter application.
+## Installation
+1. Clone the repo:  
+git clone https://github.com/SaadAhmad04/QuickPost.git
+2. Open in IntelliJ IDEA.
+3. Run:
+flutter pub get
+4. Set up Firebase (`google-services.json` for Android, `GoogleService-Info.plist` for iOS).
+5. Run the app:
+flutter run
+6. To get service account json(used in notifications.dart), go to firebase project settings, then go to Service Accounts tab and select NodeJs and generate the private key
+Store that key in separate file(Secret.dart) and declare it as static and final
 
-A few resources to get you started if this is your first Flutter project:
+## Contributing
+Feel free to submit issues or pull requests.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
->>>>>>> 328a02e (QuickPost 1.0.0)
+## License
+[MIT](LICENSE)
