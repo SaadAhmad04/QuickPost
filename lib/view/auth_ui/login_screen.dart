@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:quickpost/view/admin_home_screen.dart';
 import 'package:quickpost/view/auth_ui/signup_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../controller/notifications.dart';
@@ -212,6 +213,45 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  // void handleLogin() async {
+  //   if (_formKey.currentState!.validate()) {
+  //     setState(() => loading = true);
+  //     try {
+  //       UserCredential value = await _auth.signInWithEmailAndPassword(
+  //         email: emailController.text.trim(),
+  //         password: passwordController.text.trim(),
+  //       );
+  //       String uid = value.user!.uid;
+  //       DocumentSnapshot userDoc = await Api.userRef.doc(uid).get();
+  //       if (userDoc.exists) {
+  //         UserModel userModel = UserModel.fromFirestore(
+  //           userDoc.data()! as Map<String, dynamic>,
+  //         );
+  //         Api.user = userModel;
+  //         Api.user!.push_token = await Notifications.init();
+  //         await Api.userRef
+  //             .doc(Api.auth.currentUser!.uid)
+  //             .update({'push_token': Api.user!.push_token});
+  //         final pref = await SharedPreferences.getInstance();
+  //         String currentUser = jsonEncode(userModel.toJson());
+  //         await pref.setString('user', currentUser);
+  //         Utilities().showMessage(context, 'Signed in as: ${userModel.name}');
+  //         Navigator.push(
+  //           context,
+  //           MaterialPageRoute(builder: (context) => const HomeScreen()),
+  //         );
+  //       } else {
+  //         Utilities().showMessage(context, 'User document not found.');
+  //       }
+  //     } catch (error) {
+  //       debugPrint(error.toString());
+  //       Utilities().showMessage(context, error.toString());
+  //     } finally {
+  //       setState(() => loading = false);
+  //     }
+  //   }
+  // }
+
   void handleLogin() async {
     if (_formKey.currentState!.validate()) {
       setState(() => loading = true);
@@ -221,32 +261,64 @@ class _LoginScreenState extends State<LoginScreen> {
           password: passwordController.text.trim(),
         );
         String uid = value.user!.uid;
-        DocumentSnapshot userDoc = await Api.userRef.doc(uid).get();
-        if (userDoc.exists) {
-          UserModel userModel = UserModel.fromFirestore(
-            userDoc.data()! as Map<String, dynamic>,
-          );
-          Api.user = userModel;
+
+        // 1) Check admin collection first
+        final adminDoc = await FirebaseFirestore.instance.collection('admin').doc(uid).get();
+
+        if (adminDoc.exists) {
+          final adminData = adminDoc.data()! as Map<String, dynamic>;
+          final adminModel = UserModel.fromFirestore(adminData);
+
+          Api.user = adminModel;
           Api.user!.push_token = await Notifications.init();
-          await Api.userRef
-              .doc(Api.auth.currentUser!.uid)
-              .update({'push_token': Api.user!.push_token});
+          await FirebaseFirestore.instance.collection('admin').doc(uid).update({
+            'push_token': Api.user!.push_token,
+          });
+
+          // Set the API flag and persist role
+          Api.isAdmin = true;
           final pref = await SharedPreferences.getInstance();
-          String currentUser = jsonEncode(userModel.toJson());
-          await pref.setString('user', currentUser);
-          Utilities().showMessage(context, 'Signed in as: ${userModel.name}');
-          Navigator.push(
+          await pref.setString('user', jsonEncode(adminModel.toJson()));
+          await pref.setBool('isAdmin', true);
+
+          Utilities().showMessage(context, 'Signed in as Admin: ${adminModel.name}');
+
+          Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => const HomeScreen()),
+            MaterialPageRoute(builder: (context) => const AdminHomeScreen()),
           );
-        } else {
-          Utilities().showMessage(context, 'User document not found.');
         }
+        else {
+          DocumentSnapshot userDoc = await Api.userRef.doc(uid).get();
+          if (userDoc.exists) {
+            UserModel userModel = UserModel.fromFirestore(userDoc.data()! as Map<String, dynamic>);
+            Api.user = userModel;
+            Api.user!.push_token = await Notifications.init();
+            await Api.userRef.doc(Api.auth.currentUser!.uid).update({
+              'push_token': Api.user!.push_token
+            });
+
+            // Set API flag and persist role
+            Api.isAdmin = false;
+            final pref = await SharedPreferences.getInstance();
+            await pref.setString('user', jsonEncode(userModel.toJson()));
+            await pref.setBool('isAdmin', false);
+
+            Utilities().showMessage(context, 'Signed in as: ${userModel.name}');
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const HomeScreen()),
+            );
+          } else {
+            Utilities().showMessage(context, 'User document not found.');
+          }
+        }
+
       } catch (error) {
         debugPrint(error.toString());
         Utilities().showMessage(context, error.toString());
       } finally {
-        setState(() => loading = false);
+        if (mounted) setState(() => loading = false);
       }
     }
   }

@@ -8,7 +8,7 @@ import Foundation
 import app_settings
 import cloud_firestore
 import emoji_picker_flutter
-import ffmpeg_kit_flutter
+import ffmpeg_kit_flutter_new
 import file_selector_macos
 import firebase_app_check
 import firebase_auth

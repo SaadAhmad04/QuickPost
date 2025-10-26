@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../controller/apis.dart';
 import '../model/user_model.dart';
+import 'admin_home_screen.dart';
 import 'auth_ui/login_screen.dart';
 import 'home_screen.dart';
 
@@ -44,19 +45,32 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
     if (Api.auth.currentUser != null) {
       final pref = await SharedPreferences.getInstance();
       String? currentUser = pref.getString('user');
-      Api.user = UserModel.fromJson(jsonDecode(currentUser!));
+      final wasAdmin = pref.getBool('isAdmin') ?? false;
+
+      if (currentUser != null) {
+        Api.user = UserModel.fromJson(jsonDecode(currentUser));
+      }
+
+      // set API role flag
+      Api.isAdmin = wasAdmin;
 
       Future.delayed(Duration(seconds: 3), () {
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => HomeScreen()));
+        if (Api.isAdmin) {
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (context) => const AdminHomeScreen()));
+        } else {
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (context) => const HomeScreen()));
+        }
       });
     } else {
       Future.delayed(Duration(seconds: 3), () {
         Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => LoginScreen()));
+            context, MaterialPageRoute(builder: (context) => const LoginScreen()));
       });
     }
   }
+
 
   @override
   Widget build(BuildContext context) {

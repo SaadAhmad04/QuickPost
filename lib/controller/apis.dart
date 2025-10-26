@@ -16,6 +16,7 @@ class Api {
   static File? video;
   static ImagePicker videoPicker = ImagePicker();
   static UserModel? user;
+  static bool isAdmin = false;
 
   static Future<void> logout(BuildContext context) async {
     await auth.signOut().then((value) {

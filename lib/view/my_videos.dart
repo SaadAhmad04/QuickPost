@@ -2,7 +2,8 @@ import 'dart:developer';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:ffmpeg_kit_flutter/ffmpeg_kit.dart';
+// import 'package:ffmpeg_kit_flutter/ffmpeg_kit.dart';
+import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -110,19 +111,19 @@ class _MyVideosState extends State<MyVideos> {
                 },
                 color: Colors.purple.shade800,
               ),
-              // actions: [
-              //   Padding(
-              //     padding: const EdgeInsets.all(8.0),
-              //     child: IconButton(
-              //         onPressed: () {
-              //           Navigator.push(
-              //               context,
-              //               MaterialPageRoute(
-              //                   builder: (context) => VideoAnalyticsScreen()));
-              //         },
-              //         icon: Icon(Icons.analytics)),
-              //   )
-              // ],
+              actions: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: IconButton(
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => VideoAnalyticsScreen()));
+                      },
+                      icon: Icon(Icons.analytics)),
+                )
+              ],
             ),
             body: ListView.builder(
               itemCount: snapshot.data!.docs.length,
@@ -143,6 +144,8 @@ class _MyVideosState extends State<MyVideos> {
                     "${dateTime.year}-${dateTime.month}-${dateTime.day}";
                 String time = "${dateTime.hour}:${dateTime.minute}";
                 String vid = videoDoc['uid'];
+
+
 
                 return Padding(
                   padding: const EdgeInsets.all(8.0),
